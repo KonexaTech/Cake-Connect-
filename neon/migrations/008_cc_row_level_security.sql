@@ -29,7 +29,7 @@ CREATE POLICY cc_event_insert ON public.cc_order_status_events FOR INSERT WITH C
 DROP POLICY IF EXISTS cc_commission_admin_read ON public.cc_commission_entries;
 CREATE POLICY cc_commission_admin_read ON public.cc_commission_entries FOR SELECT USING (EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')));
 DROP POLICY IF EXISTS cc_commission_completed_insert ON public.cc_commission_entries;
-CREATE POLICY cc_commission_completed_insert ON public.cc_commission_entries FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM public.cc_orders o JOIN public.cc_shops s ON s.id=o.shop_id WHERE o.id=order_id AND o.shop_id=shop_id AND o.status='completed' AND o.test_order=false AND s.owner_subject=NULLIF(current_setting('app.current_subject', true),'')));
+CREATE POLICY cc_commission_completed_insert ON public.cc_commission_entries FOR INSERT WITH CHECK (false)
 DROP POLICY IF EXISTS cc_commission_payment_admin ON public.cc_commission_payments;
 CREATE POLICY cc_commission_payment_admin ON public.cc_commission_payments FOR ALL USING (EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),''))) WITH CHECK (EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')));
 DROP POLICY IF EXISTS cc_notification_read ON public.cc_notifications;
@@ -66,7 +66,7 @@ ALTER TABLE public.cc_menu_items FORCE ROW LEVEL SECURITY;
 ALTER TABLE public.cc_orders FORCE ROW LEVEL SECURITY;
 ALTER TABLE public.cc_order_items FORCE ROW LEVEL SECURITY;
 ALTER TABLE public.cc_order_status_events FORCE ROW LEVEL SECURITY;
-ALTER TABLE public.cc_commission_entries FORCE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_commission_entries NO FORCE ROW LEVEL SECURITY;
 ALTER TABLE public.cc_commission_payments FORCE ROW LEVEL SECURITY;
 ALTER TABLE public.cc_notifications FORCE ROW LEVEL SECURITY;
 ALTER TABLE public.cc_shop_applications FORCE ROW LEVEL SECURITY;
