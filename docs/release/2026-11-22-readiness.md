@@ -86,3 +86,11 @@ The public entry point remains the existing clearly labelled browser-session dem
 Verified release gate coverage is **1/10 (10%)** under the user's ten mandatory definitions; this is not a probability, implementation percentage or delivery estimate. Seven gates are blocked and two fail. Public release stays **HOLD**.
 
 Next milestone: approve and reconcile Cake-specific commission/quote/deposit requirements; verify the existing QA Worker deployment and dedicated non-bypass database role; recover a complete versioned schema and restore procedure; then run isolated customer→merchant→completion and unauthorized access acceptance before connecting real delivery or payments.
+
+## Controlled-beta continuity: compose existing QA deployment gate
+
+The existing unmerged `feature/qa-api-hardening-20261121` branch contains a more reliable QA credential gate than main. That exact workflow repair has been composed into this candidate, preserving `npm ci` and the existing QA-only Worker identity, database-host guard, branch trigger and manual dispatch. No production branch or frontend deployment is activated. No app database credential is copied from another app.
+
+The workflow now stops when either its own `CLOUDFLARE_API_TOKEN` or `NEON_DATABASE_URL` repository secret is absent; it does not return a successful skipped-deployment result. When both exist, it deploys only the existing configured QA Worker and sets its server-side DATABASE_URL through the existing secret mechanism. Two local behavioral tests cover all four credential-presence combinations and assert no credential values appear in output. Root checks and production build passed after composition.
+
+The deployment workflow can be manually run on this repair branch to establish current configuration, but no deployment PASS is inferred from unit tests. A successful workflow still needs live source/runtime-role, authenticated lifecycle, persistence, negative authorization and mobile acceptance. Missing token/configuration must be entered through private GitHub settings, never chat. Reading Actions-secret metadata through the available integration can be forbidden; a denied metadata read is not proof that a secret is absent.
