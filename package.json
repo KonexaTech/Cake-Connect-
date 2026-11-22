@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "test": "node --test tests/*.test.mjs worker/test/role-policy.test.mjs",
+    "test": "node --test tests/*.test.* worker/test/role-policy.test.mjs worker/test/checkout-validation.test.mjs",
     "check": "node --check neon-app.js && node --check worker/src/index.js && node --check worker/src/neon-api.js && npm test",
     "test:e2e": "playwright test"
   },
@@ -14,6 +14,7 @@
     "vite": "^6.3.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@playwright/test": "^1.53.0"
   }
 }

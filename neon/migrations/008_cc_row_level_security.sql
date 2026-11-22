@@ -1,3 +1,18 @@
+-- Source repair only. Review on an isolated branch; no automatic production rollout.
+-- FORCE alone does not enable RLS on a fresh database.
+ALTER TABLE public.cc_admins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_shops ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_menu_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_order_status_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_commission_entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_commission_payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_shop_applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_custom_cake_orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_cake_order_images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cc_cake_payments ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS cc_self_read ON public.cc_admins;
 CREATE POLICY cc_self_read ON public.cc_admins FOR SELECT USING (subject=NULLIF(current_setting('app.current_subject', true),''));
 DROP POLICY IF EXISTS cc_marketplace_read ON public.cc_shops;
@@ -29,7 +44,7 @@ CREATE POLICY cc_event_insert ON public.cc_order_status_events FOR INSERT WITH C
 DROP POLICY IF EXISTS cc_commission_admin_read ON public.cc_commission_entries;
 CREATE POLICY cc_commission_admin_read ON public.cc_commission_entries FOR SELECT USING (EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')));
 DROP POLICY IF EXISTS cc_commission_completed_insert ON public.cc_commission_entries;
-CREATE POLICY cc_commission_completed_insert ON public.cc_commission_entries FOR INSERT WITH CHECK (false)
+CREATE POLICY cc_commission_completed_insert ON public.cc_commission_entries FOR INSERT WITH CHECK (false);
 DROP POLICY IF EXISTS cc_commission_payment_admin ON public.cc_commission_payments;
 CREATE POLICY cc_commission_payment_admin ON public.cc_commission_payments FOR ALL USING (EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),''))) WITH CHECK (EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')));
 DROP POLICY IF EXISTS cc_notification_read ON public.cc_notifications;
@@ -37,7 +52,7 @@ CREATE POLICY cc_notification_read ON public.cc_notifications FOR SELECT USING (
 DROP POLICY IF EXISTS cc_notification_update ON public.cc_notifications;
 CREATE POLICY cc_notification_update ON public.cc_notifications FOR UPDATE USING (recipient_subject=NULLIF(current_setting('app.current_subject', true),'')) WITH CHECK (recipient_subject=NULLIF(current_setting('app.current_subject', true),''));
 DROP POLICY IF EXISTS cc_notification_insert ON public.cc_notifications;
-CREATE POLICY cc_notification_insert ON public.cc_notifications FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM public.cc_admins ad WHERE ad.subject=NULLIF(current_setting('app.current_subject', true),'')) OR (order_id IS NOT NULL AND EXISTS (SELECT 1 FROM public.cc_orders o WHERE o.id=order_id AND o.customer_subject=NULLIF(current_setting('app.current_subject', true),''))) OR (order_id IS NULL AND EXISTS (SELECT 1 FROM public.cc_shop_applications ap WHERE ap.applicant_subject=recipient_subject AND EXISTS (SELECT 1 FROM public.cc_admins ad WHERE ad.subject=NULLIF(current_setting('app.current_subject', true),'')))))
+CREATE POLICY cc_notification_insert ON public.cc_notifications FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM public.cc_admins ad WHERE ad.subject=NULLIF(current_setting('app.current_subject', true),'')) OR (order_id IS NOT NULL AND EXISTS (SELECT 1 FROM public.cc_orders o WHERE o.id=order_id AND o.customer_subject=NULLIF(current_setting('app.current_subject', true),''))) OR (order_id IS NULL AND EXISTS (SELECT 1 FROM public.cc_shop_applications ap WHERE ap.applicant_subject=recipient_subject AND EXISTS (SELECT 1 FROM public.cc_admins ad WHERE ad.subject=NULLIF(current_setting('app.current_subject', true),'')))));
 DROP POLICY IF EXISTS cc_application_read ON public.cc_shop_applications;
 CREATE POLICY cc_application_read ON public.cc_shop_applications FOR SELECT USING (applicant_subject=NULLIF(current_setting('app.current_subject', true),'') OR EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')));
 DROP POLICY IF EXISTS cc_application_insert ON public.cc_shop_applications;
@@ -47,7 +62,7 @@ CREATE POLICY cc_application_admin_update ON public.cc_shop_applications FOR UPD
 DROP POLICY IF EXISTS cc_cake_order_read ON public.cc_custom_cake_orders;
 CREATE POLICY cc_cake_order_read ON public.cc_custom_cake_orders FOR SELECT USING (customer_subject=NULLIF(current_setting('app.current_subject', true),'') OR EXISTS (SELECT 1 FROM public.cc_shops s WHERE s.id=baker_shop_id AND s.owner_subject=NULLIF(current_setting('app.current_subject', true),'')) OR EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')));
 DROP POLICY IF EXISTS cc_cake_order_customer_insert ON public.cc_custom_cake_orders;
-CREATE POLICY cc_cake_order_customer_insert ON public.cc_custom_cake_orders FOR INSERT WITH CHECK (customer_subject=NULLIF(current_setting('app.current_subject', true),'') AND quoted_total_cents IS NULL AND deposit_required_cents=0 AND deposit_paid_cents=0 AND final_paid_cents=0 AND status='requested' AND EXISTS (SELECT 1 FROM public.cc_shops s WHERE s.id=baker_shop_id AND s.approved=true))
+CREATE POLICY cc_cake_order_customer_insert ON public.cc_custom_cake_orders FOR INSERT WITH CHECK (customer_subject=NULLIF(current_setting('app.current_subject', true),'') AND quoted_total_cents IS NULL AND deposit_required_cents=0 AND deposit_paid_cents=0 AND final_paid_cents=0 AND status='requested' AND EXISTS (SELECT 1 FROM public.cc_shops s WHERE s.id=baker_shop_id AND s.approved=true));
 DROP POLICY IF EXISTS cc_cake_order_baker_update ON public.cc_custom_cake_orders;
 CREATE POLICY cc_cake_order_baker_update ON public.cc_custom_cake_orders FOR UPDATE USING (EXISTS (SELECT 1 FROM public.cc_shops s WHERE s.id=baker_shop_id AND s.owner_subject=NULLIF(current_setting('app.current_subject', true),'')) OR EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),''))) WITH CHECK (EXISTS (SELECT 1 FROM public.cc_shops s WHERE s.id=baker_shop_id AND s.owner_subject=NULLIF(current_setting('app.current_subject', true),'')) OR EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')));
 DROP POLICY IF EXISTS cc_cake_image_read ON public.cc_cake_order_images;

@@ -32,3 +32,23 @@ test("recovery pages require the staging Neon-only mode, and unknown paths remai
 
   assert.equal((await worker.fetch(request("/unrelated"), env)).status, 404);
 });
+
+test("configured NEON_AUTH_URL powers both recovery routes", async t => {
+  const authUrl="https://neon.example.test/neondb/auth";
+  const configured={NEON_ONLY_MODE:"true",NEON_AUTH_URL:authUrl};
+  const page=await worker.fetch(request("/password-reset"),configured);
+  assert.ok((await page.text()).includes("createAuthClient('"+authUrl+"')"));
+  let calls=0;
+  t.mock.method(globalThis,"fetch",async (url,options)=>{
+    calls++;
+    assert.equal(url,authUrl+"/request-password-reset");
+    assert.deepEqual(JSON.parse(options.body),{email:"buyer@example.test",redirectTo:"https://worker.example.test/password-reset"});
+    return new Response("{}",{status:200});
+  });
+  const response=await worker.fetch(new Request("https://worker.example.test/password-reset/request",{
+    method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({email:"buyer@example.test"})
+  }),configured);
+  assert.equal(response.status,200);
+  assert.equal(calls,1);
+  assert.doesNotMatch(await response.text(),/buyer@example/);
+});
