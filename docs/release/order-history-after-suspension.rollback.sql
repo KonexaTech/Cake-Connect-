@@ -1,0 +1,11 @@
+-- QA rollback to captured previous SELECT policies. No rows/tables deleted.
+BEGIN;
+DROP POLICY IF EXISTS cc_item_read ON public.cc_order_items;
+CREATE POLICY cc_item_read ON public.cc_order_items FOR SELECT USING (EXISTS (SELECT 1 FROM public.cc_orders o JOIN public.cc_shops s ON s.id=o.shop_id WHERE o.id=order_id AND (o.customer_subject=NULLIF(current_setting('app.current_subject', true),'') OR s.owner_subject=NULLIF(current_setting('app.current_subject', true),'') OR EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')))));
+DROP POLICY IF EXISTS cc_event_read ON public.cc_order_status_events;
+CREATE POLICY cc_event_read ON public.cc_order_status_events FOR SELECT USING (EXISTS (SELECT 1 FROM public.cc_orders o JOIN public.cc_shops s ON s.id=o.shop_id WHERE o.id=order_id AND (o.customer_subject=NULLIF(current_setting('app.current_subject', true),'') OR s.owner_subject=NULLIF(current_setting('app.current_subject', true),'') OR EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')))));
+DROP POLICY IF EXISTS cc_cake_image_read ON public.cc_cake_order_images;
+CREATE POLICY cc_cake_image_read ON public.cc_cake_order_images FOR SELECT USING (EXISTS (SELECT 1 FROM public.cc_custom_cake_orders o JOIN public.cc_shops s ON s.id=o.baker_shop_id WHERE o.id=cake_order_id AND (o.customer_subject=NULLIF(current_setting('app.current_subject', true),'') OR s.owner_subject=NULLIF(current_setting('app.current_subject', true),'') OR EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')))));
+DROP POLICY IF EXISTS cc_cake_payment_read ON public.cc_cake_payments;
+CREATE POLICY cc_cake_payment_read ON public.cc_cake_payments FOR SELECT USING (EXISTS (SELECT 1 FROM public.cc_custom_cake_orders o JOIN public.cc_shops s ON s.id=o.baker_shop_id WHERE o.id=cake_order_id AND (o.customer_subject=NULLIF(current_setting('app.current_subject', true),'') OR s.owner_subject=NULLIF(current_setting('app.current_subject', true),'') OR EXISTS (SELECT 1 FROM public.cc_admins a WHERE a.subject=NULLIF(current_setting('app.current_subject', true),'')))));
+COMMIT;

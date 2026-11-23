@@ -3,3 +3,15 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Isolated, generated QA frontend artifacts
+dist-qa/
+
+# Generated browser diagnostics (preserved locally)
+test-results/
+playwright-report/
+
+# Worker local state and private development bindings
+.wrangler/
+.dev.vars
+.dev.vars.*

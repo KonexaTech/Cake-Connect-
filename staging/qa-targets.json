@@ -1,0 +1,5 @@
+{
+  "apiUrl": "https://cake-connect-api-qa.siboniisozulu.workers.dev",
+  "authUrl": "https://ep-lingering-sun-bekugkhi.neonauth.c-9.us-east-2.aws.neon.tech/neondb/auth",
+  "siteOrigin": "https://cake-connect-neon-staging.pages.dev"
+}

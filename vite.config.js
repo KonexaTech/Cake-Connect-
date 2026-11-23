@@ -4,6 +4,8 @@ import { resolve } from "node:path";
 // Keep the multi-page marketplace entry points and relative assets for GitHub Pages.
 export default defineConfig({
   base: "./",
+  // QA artifact generation must not reload other parallel browser sessions.
+  server: { watch: { ignored: ["**/dist-qa/**"] } },
   build: {
     rollupOptions: {
       input: {
