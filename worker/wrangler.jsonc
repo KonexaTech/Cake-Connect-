@@ -14,6 +14,8 @@
     "ALLOWED_ORIGIN": "https://siboniisozulu-alt.github.io",
     "ALLOWED_ORIGINS": "https://siboniisozulu-alt.github.io,https://cake-connect-neon-staging.pages.dev",
     "CUSTOM_CAKES_ENABLED": "false",
-    "DELIVERY_CALLBACKS_ENABLED": "false"
+    "DELIVERY_CALLBACKS_ENABLED": "false",
+    "DELIVERY_DISPATCH_ENABLED": "false",
+    "DELIVERY_SOURCE_LOOKUP_ENABLED": "false"
   }
 }
