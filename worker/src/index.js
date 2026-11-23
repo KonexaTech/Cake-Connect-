@@ -1,3 +1,4 @@
+import { deliveryEvents } from "./delivery-events.js";
 import { neonApi } from "./neon-api.js";
 import { Client } from "pg";
 import { verifiedNeonSubject } from "./neon-auth.js";
@@ -81,6 +82,7 @@ export default {
     }
     if (request.method === "GET" && path === "/health") return json({ status: "ok", service: "cake-connect-api", database: "not_checked" }, 200, headers);
 
+    if(path === "/internal/delivery/events") return deliveryEvents(request, env, withDb);
     if (!path.startsWith("/api/")) return json({ error: "Not found" }, 404, headers);
     try {
       const response = await neonApi(request, env, (environment, callback) => withDb(environment, callback, request));
