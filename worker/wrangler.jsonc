@@ -12,6 +12,7 @@
     "NEON_AUTH_URL": "https://ep-lingering-sun-bekugkhi.neonauth.c-9.us-east-2.aws.neon.tech/neondb/auth",
     "EXPECTED_NEON_HOST": "ep-lingering-sun-bekugkhi.c-9.us-east-2.aws.neon.tech",
     "ALLOWED_ORIGIN": "https://siboniisozulu-alt.github.io",
-    "ALLOWED_ORIGINS": "https://siboniisozulu-alt.github.io,https://cake-connect-neon-staging.pages.dev"
+    "ALLOWED_ORIGINS": "https://siboniisozulu-alt.github.io,https://cake-connect-neon-staging.pages.dev",
+    "CUSTOM_CAKES_ENABLED": "false"
   }
 }

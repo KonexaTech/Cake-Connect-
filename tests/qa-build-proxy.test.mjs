@@ -47,7 +47,7 @@ test('separate QA build preserves production configuration and contains only app
  const root=await mkdtemp(join(tmpdir(),'konexa-qa-build-'));const actual=resolve('.');
  try{
   for(const dir of ['scripts','staging','worker'])await mkdir(join(root,dir));
-  const files=['neon-customer.html','neon-owner.html','neon-admin.html','neon-password-reset.html','neon-reset-password.html','neon-app.js','menu-text.mjs','premium.css','icon.svg','manifest.json','app-config.js','staging/qa-targets.json','staging/qa-proxy.js','worker/wrangler.jsonc'];
+  const files=['neon-customer.html','neon-owner.html','neon-admin.html','neon-password-reset.html','neon-reset-password.html','neon-app.js','menu-text.mjs','premium.css','icon.svg','manifest.json','app-config.js','custom-cake-ui.mjs','staging/qa-targets.json','staging/qa-proxy.js','worker/wrangler.jsonc'];
   for(const file of files)await copyFile(join(actual,file),join(root,file));
   const before=await readFile(join(root,'app-config.js'),'utf8');
   const built=await buildQa(root,sourceCommit);

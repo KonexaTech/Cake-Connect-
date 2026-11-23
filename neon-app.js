@@ -1,6 +1,8 @@
 import { createAuthClient } from "https://esm.sh/@neon/auth@latest";
 import { parseMenuText, formatMenuText, planMenuChanges } from "./menu-text.mjs";
 import { APP_CONFIG } from "./app-config.js";
+import { installCustomCakeControls } from "./custom-cake-ui.mjs";
+let customCakeControls=null;
 const AUTH_URL=APP_CONFIG.authUrl || "https://unconfigured.invalid/neondb/auth";
 const auth=createAuthClient(AUTH_URL,{fetchOptions:{credentials:"include"}});
 const $=id=>document.getElementById(id), role=document.body.dataset.role;
@@ -16,15 +18,17 @@ async function verifyAdminAccess(){if(role!=="admin")return;try{await api("/api/
 async function api(path,method="GET",body,publicRoute=false){const headers={"content-type":"application/json"};if(!publicRoute){const r=await auth.token();if(r.error)throw Error(r.error.message);if(!r.data?.token)throw Error("Sign in to continue");headers.authorization="Bearer "+r.data.token;}const response=await fetch(API+path,{method,headers,body:body?JSON.stringify(body):undefined});const data=await response.json();if(!response.ok)throw Error(data.error||"Request failed");return data}
 function option(select,items,label){select.replaceChildren(new Option("Select",""),...items.map(x=>new Option(label(x),x.id)))}
 async function showIdentity(){
+  customCakeControls?.clear();
   showDashboardPanels(false);
   const r=await auth.getSession();
   if(r.error)throw Error(r.error.message);
   if(!r.data?.user){$("identity").textContent="Not signed in";return}
-  if(role!=="owner"&&role!=="admin"){showDashboardPanels(true);$("identity").textContent=r.data.user.email;return}
+  if(role!=="owner"&&role!=="admin"){showDashboardPanels(true);$("identity").textContent=r.data.user.email;await customCakeControls?.refreshCapabilities();return}
   try{
     const me=await api("/api/me");
     const allowed=role==="admin"?me.admin===true:me.admin===false;
     showDashboardPanels(allowed);
+    if(allowed)await customCakeControls?.refreshCapabilities();
     $("identity").textContent=allowed?r.data.user.email:(role==="owner"?"Owner access denied: an administrator account is signed in. Sign out and use a different shop-owner email.":"Administrator access denied: this account is not an approved administrator.");
   }catch(e){
     $("identity").textContent="Unable to verify "+role+" access. Try signing in again.";
@@ -102,6 +106,9 @@ bind("orders",async()=>out(await api("/api/admin/orders")));
 bind("notifications",async()=>out(await api("/api/notifications")));
 bind("markRead",async()=>out(await api("/api/notifications/"+encodeURIComponent(required("notificationId","Notification ID"))+"/read","PATCH")));
 async function pollNotifications(){if(document.visibilityState!=="visible"||(role==="owner"||role==="admin")&&!dashboardAccess)return;try{const r=await api("/api/notifications");const unread=r.notifications.filter(n=>!n.read_at).length;$("unread").textContent=unread?unread+" unread notifications":"No unread notifications"}catch{$("unread").textContent="Sign in to see notifications"}}
+customCakeControls=installCustomCakeControls({api,role});
+for(const id of ['signout','signup'])$(id)?.addEventListener('click',()=>customCakeControls.clear());
+$('signin')?.addEventListener('submit',()=>customCakeControls.clear());
 showIdentity().then(pollNotifications).catch(()=>{});
 setInterval(pollNotifications,20000);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")pollNotifications()});

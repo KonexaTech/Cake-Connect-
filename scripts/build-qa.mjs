@@ -11,7 +11,7 @@ export async function buildQa(root,sourceCommit) {
  if(!worker.name.endsWith('-api-qa')||target.apiUrl!==expectedApi||target.authUrl!==worker.vars.NEON_AUTH_URL||!worker.vars.ALLOWED_ORIGINS.split(',').includes(target.siteOrigin))throw Error('QA endpoints do not match this app isolated configuration');
  for(const value of Object.values(target)){const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash)throw Error('Public QA endpoints only');}
  const output=resolve(root,'dist-qa');await rm(output,{recursive:true,force:true});await mkdir(output);
- const files=['neon-customer.html','neon-owner.html','neon-admin.html','neon-password-reset.html','neon-reset-password.html','menu-text.mjs','premium.css','icon.svg','manifest.json'];
+ const files=['neon-customer.html','neon-owner.html','neon-admin.html','neon-password-reset.html','neon-reset-password.html','menu-text.mjs','premium.css','icon.svg','manifest.json','custom-cake-ui.mjs'];
  for(const file of files)await copyFile(resolve(root,file),resolve(output,file));
  await copyFile(resolve(root,'neon-customer.html'),resolve(output,'index.html'));
  await copyFile(resolve(root,'neon-app.js'),resolve(output,'marketplace-app.js'));
