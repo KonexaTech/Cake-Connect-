@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "test": "node --test tests/*.test.* worker/test/role-policy.test.mjs worker/test/checkout-validation.test.mjs",
+    "test": "node --test tests/*.test.* worker/test/role-policy.test.mjs worker/test/checkout-validation.test.mjs worker/test/delivery-source-lookup.test.mjs",
     "check": "node --check neon-app.js && node --check worker/src/index.js && node --check worker/src/neon-api.js && npm test",
     "test:e2e": "playwright test",
     "build:qa": "node scripts/build-qa.mjs"
