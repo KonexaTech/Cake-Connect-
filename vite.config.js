@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 export default defineConfig({
   base: "./",
   // QA artifact generation must not reload other parallel browser sessions.
-  server: { watch: { ignored: ["**/dist-qa/**"] } },
+  server: { watch: { ignored: ["**/dist-qa*/**"] } },
   build: {
     rollupOptions: {
       input: {
