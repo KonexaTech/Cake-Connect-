@@ -5,7 +5,7 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "workers_dev": true,
+  "workers_dev": false,
   "account_id": "74fdd987dfadfdbb7322d9fc7f705499",
   "vars": {
     "NEON_ONLY_MODE": "true",
@@ -16,6 +16,8 @@
     "CUSTOM_CAKES_ENABLED": "false",
     "DELIVERY_CALLBACKS_ENABLED": "false",
     "DELIVERY_DISPATCH_ENABLED": "false",
-    "DELIVERY_SOURCE_LOOKUP_ENABLED": "false"
-  }
+    "DELIVERY_SOURCE_LOOKUP_ENABLED": "false",
+    "EXPECTED_NEON_ROLE": "cc_worker"
+  },
+  "preview_urls": false
 }
